@@ -1,104 +1,130 @@
-<center><h1>Text_To_Video </h1></center>
-
-<h2>介绍</h2>
-
-Text_To_Video_Web 是一个利用本文直接生成视频的项目，可以帮助广大自媒体应用者快速批量生产视频，本项目都是远程调用，避免的网友显卡资源不充足的情况。该项目主要是集成了chatgpt、midjourney、免费的tts服务，最终利用moviepy合成视频。
+这是一个利用文本生成视频的项目，帮助视频制作者一键生成视频。
 
 
 
+# 使用方法
 
-Text_To_Video_Web 项目旨在与开源社区一起推动智能项目的工程落地与发展，恳请开发者和大家遵守开源协议，勿将项目代码及基于项目产生的衍生物用于任何可能给国家和社会带来危害的用途以及用于任何未经过安全评估和备案的服务。
-该项目后续会出os应用和安卓应用
+## 环境准备
 
-<h2>使用方式</h2>
+创建虚拟环境，python版本为3.10
 
-<h3>版本要求</h3>
+```
+conda create -n yourEnv python=3.6
+```
 
-工程代码是在python的3.10版本上运行的，建议保持python版本一致
-```shell
+激活
+
+windows ==>
+
+```python
+activate yourEnv
+```
+
+ linux/mac ==>
+
+```python
+source activate yourEnv
+```
+
+安装需要的包
+
+```python
 pip install -r requirements.txt
 ```
 
+生成视频用到了moviepy，需要安装ImageMagick，安装方法参考
 
-<h3>环境准备</h3>
-1、 申请openai官网的api的key。
+[1]: https://blog.csdn.net/popboy29/article/details/135587838?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate
 
-2、 如果你想使用midjourney，需要准备以下四个token
+安装完成后将data_to_vedio.py中的os.environ["IMAGEMAGICK_BINARY"]替换为你自己的路径
 
-```python
-#用户的token值
-#机器人的token
-#服务器的token
-#频道的token
-```
+## API准备
 
-3、 在网页[http://127.0.0.1:5000/](http://127.0.0.1:5000/)中替换自己的信息
+1.openai api申请
 
-4、 如果你选用了midjourney，在midjourney/.env中替换你自己的信息
+2.微软TTS API申请，可以参考：
 
-5、 如果没有选用midjourney，2和4可以省略。
+[2]: https://blog.csdn.net/suiyueruge1314/article/details/126445921
 
-<h3>项目启动</h3>
+将获取的API配置信息填入data.csv中
 
-1、 直接运行根目录下的app.py
+3.在环境变量中填入你的API_URL和设备名称
 
-2、 打开浏览器[http://127.0.0.1:5000/](http://127.0.0.1:5000/)，如下图，修改你本人的信息。微软的tts信息和openai的信息是必填的。
+![enviorment.png](image/enviorment.png)
 
-![img.png](img.png)  
+4.将data_to_image.py中的base_url替换为你自己的url
 
-3、如果你选用了midjourney信息，还需要修改midjourney/.env的信息。
+## 项目启动
 
-![img_2.png](img_2.png)  
-
-4、启动midjourney下的server.py和task_bot.py。
-
-
-
-
-
-<h3>视频生成</h3>
+1. 运行根目录下的app.py
+2. 打开浏览器http://127.0.0.1:5000/，如下图
+![chushi.png](image/chushi.png)
+3.生成结果如图
+![result.png](image/reslut.png)
+## 视频生成
 
 项目正式启动后，直接在文本框中输入内容，点击生成视频即可。
 
-![img_3.png](img_3.png)  
+生成的分句存在：data/data_split
 
-生成的视频会保存在data/data_vedio中，midjourney的视频会保存在data/data_vedio_midjourney中。
+生成的图片描述存在：data/data_prompt
 
+生成的音频存在：data/data_audio
 
+生成的图片存在：data/data_image
 
+生成的视频存在：data/data_vedio
 
-<h2>代码阅读</h2>
+## 代码解释
 
-代码执行逻辑流程如下：
-+ 0、项目启动。
-+ 1、切割源文件，句号分割语料，形成新的文件。
-+ 2、利用chatgpt生成提示词，prompt。
-+ 3、利用第1步的语料，调用tts的api生成语音。
-+ 4、利用第2步生成提示词，调用openai的api生成图片。或者调用midjourney的api生成视频。
-+ 5、将第3步的语音和第4步的图片合成视频。
+0、项目启动
 
-分别对应：
 ```python
-#app.py
-#data_split.py
-#data_promt_words.py
-#data_tts.py
-#data_to_image.py
-#data_to_vedio.py
-#data_to_image_midjourney
-#image_split.py
-#data_to_image_midjourney.py
+app.py
 ```
 
-<h2>协议</h2>
+1、切割源文件，句号分割语料，形成新的文件。
 
-本仓库的代码依照 Apache-2.0 协议开源。
-<h2>严禁</h2>
+```python
+data_split.py
+```
 
-未经许可，严禁商用。
+2、利用chatgpt生成图片描述，prompt。
 
+```python
+data_promt_words.py
+```
 
-<h2>欢迎关注公众号与知识星球</h2>QQ群：1083992954
+3、利用第1步的语料，调用tts的api生成语音。
 
-![img_1.png](img_1.png)
-![微信图片_20230612191801.jpg](zhishi.jpg)
+```python
+data_tts.py
+```
+
+4、利用第2步生成提示词，调用openai的api生成图片。或者调用midjourney的api生成视频。
+
+```python
+data_to_image.py
+```
+
+5、将第3步的语音和第4步的图片合成视频。
+
+```python
+data_to_vedio.py
+```
+
+6、页面html文件
+
+```
+templates/cloud/index.html
+```
+
+7.页面静态文件
+
+```
+static
+```
+本项目基于：
+
+https://github.com/guifaChild/text_to_vedio_web
+

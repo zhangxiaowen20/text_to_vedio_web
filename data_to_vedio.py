@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-作者：张贵发
-日期：2023年07月07日
-描述：将生成的语音、图像合成视频
-"""
 
 import os
-from moviepy.editor import ImageSequenceClip, AudioFileClip, concatenate_videoclips
+# 配置IMAGEMAGICK_BINARY环境变量
+os.environ["IMAGEMAGICK_BINARY"] = r"E:\imagemagick\ImageMagick-7.1.1-Q16-HDRI\magick.exe"
+from moviepy.editor import ImageSequenceClip, AudioFileClip, concatenate_videoclips,TextClip, CompositeVideoClip
 import numpy as np
+import csv
+import textwrap
+
 
 def flFunc(gf, t):  # 变换主函数
     return frameScroll(gf(t), 2)  # 一帧往前滚动2行
@@ -27,7 +26,7 @@ def frameScroll(frame, x):  # 实现帧数据环绕滚动x行
 
 
 
-def merge_vedio(image_dir_path,audio_dir_path):
+def merge_vedio(image_dir_path,audio_dir_path,word_file_path):
 
 
     # 将文件名按照顺序排列
@@ -35,6 +34,15 @@ def merge_vedio(image_dir_path,audio_dir_path):
     audio_files = sorted(os.listdir(audio_dir_path))
     print(image_files)
     clips = []
+
+    #字幕列表
+    zimu=[]
+    with open(word_file_path, 'r', encoding='utf-8') as file:
+        reader = csv.reader(file)
+        next(reader)  # 跳过标题行
+        for row in reader:
+            zimu.append(row[0])
+            print(row[0])  # 打印每一行的文本
 
     # 图片和音频的持续时间
     duration = 5  # 您可以根据需要调整此值
@@ -54,8 +62,14 @@ def merge_vedio(image_dir_path,audio_dir_path):
         # img_clip = img_clip.fl(flFunc, apply_to='mask').set_duration(
         #     audio_clip.duration)
 
+        print(zimu[i])
+        # 添加字幕
+        wrapped_text = textwrap.fill(zimu[i], width=25)+"\n"+"\n"  # 将文本分割成多行，每行最多10个字符
+        txt_clip = TextClip(wrapped_text, fontsize=40, color='white',font="KaiTi")
+        txt_clip = txt_clip.set_duration(audio_clip.duration).set_position(('bottom'))
+        clip = CompositeVideoClip([img_clip, txt_clip])
         # 将音频添加到图片剪辑中
-        clip = img_clip.set_audio(audio_clip)
+        clip = clip.set_audio(audio_clip)
 
 
         clips.append(clip)
@@ -71,6 +85,6 @@ def merge_vedio(image_dir_path,audio_dir_path):
     return new_path+".mp4"
 
 if __name__ == '__main__':
-    merge_vedio("data/data_image/侦探悬疑类/story_1","data/data_audio/侦探悬疑类/story_1")
+    merge_vedio("data/data_image/屋外风吹着","data/data_audio/屋外风吹着","data/data_split/屋外风吹着.csv")
 
 

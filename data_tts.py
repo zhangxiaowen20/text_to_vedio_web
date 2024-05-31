@@ -8,9 +8,9 @@ import os, requests, time
 from xml.etree import ElementTree
 import pandas as pd
 # 你注册申请的微软tts的api——key
-subscription_key = "你的ttskey"
-fetch_token_url = "你的url地址"
-base_url ="含有你的region"
+subscription_key = "5d9b556860034ce1be0be09e3305cf9b"
+fetch_token_url = "https://eastasia.api.cognitive.microsoft.com/sts/v1.0/issueToken"
+base_url ="https://eastasia.tts.speech.microsoft.com/"
 class TextToSpeech(object):
     def __init__(self, subscription_key,fetch_token_url,base_url):
         self.subscription_key = subscription_key
@@ -70,7 +70,7 @@ class TextToSpeech(object):
 
 def load_source_data_text(path,tts_key,tts_url,region):
     subscription_key = tts_key
-    fetch_token_url = tts_url
+    fetch_token_url = tts_url+'sts/v1.0/issueToken'
     base_url = 'https://'+region+'.tts.speech.microsoft.com/'
     app = TextToSpeech(subscription_key,fetch_token_url,base_url)
     app.get_token()
@@ -83,7 +83,18 @@ def load_source_data_text(path,tts_key,tts_url,region):
         app.save_audio(row['text'],path_child)
     return new_path
 
+def load_source_data_text2(path):
+    app = TextToSpeech(subscription_key,fetch_token_url,base_url)
+    app.get_token()
+    df_temp = pd.read_csv(path)
+    for index, row in df_temp.iterrows():
+        new_path = path.split(".csv")[0].replace("data_split","data_audio")
+        if not os.path.exists(new_path):
+            os.makedirs(new_path)
+        path_child =os.path.join(new_path,str(index))
+        app.save_audio(row['text'],path_child)
+    return new_path
 
 if __name__ == "__main__":
-    load_source_data_text("data/data_split/侦探悬疑类/story_1.csv")
+    load_source_data_text2("data/data_split/长达700.csv")
 

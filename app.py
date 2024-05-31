@@ -1,11 +1,8 @@
-# -*- coding:utf-8 -*-
-"""
-作者：张贵发
-日期：2023年07月7日
-描述：项目启动项
+import os
+import urllib
 
-"""
-from flask import Flask, render_template,request
+from flask import Flask, render_template,request,send_from_directory
+
 import webbrowser
 import threading
 import pandas as pd
@@ -13,30 +10,24 @@ import pandas as pd
 from data_promt_words import load_data_text
 from data_split import split_data_process
 from data_to_image import load_image_data
-from data_to_image_midjourney import load_image_data_midjourney
 from data_to_vedio import merge_vedio
-from data_to_vedio_midjourney import merge_vedio_mid
 from data_tts import load_source_data_text
-from midjourney.task_bot import start_robot
-from image_split import  image_split_data
 
-app = Flask(__name__)
+app = Flask(__name__,static_folder="static",template_folder="templates")
+
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static', path)
+
+@app.route('/data/<path:filename>')
+def send_vedio(filename):
+    return send_from_directory('data', filename)
 
 @app.route('/')
 def index():
     data = pd.read_csv("data.csv")
     table = data.to_html(index=False, table_id="my-table")
-    return render_template('index.html',table=table)
-
-@app.route('/save', methods=['POST'])
-def save_data():
-    table_data = request.json  # 获取传递的表格数据
-
-    # 将表格数据保存到 Pandas DataFrame
-    df = pd.DataFrame(table_data, columns=['Column1', 'Column2'])  # 替换为实际的列名
-    df.to_csv('data.csv', index=False,header=False)  # 将 DataFrame 保存为 CSV 文件
-
-    return '数据保存成功！'
+    return render_template('cloud/index.html',table=table)
 
 
 @app.route('/send', methods=['POST'])
@@ -47,19 +38,21 @@ def receive_text():
     text = data.get('text')
     text = text.replace(" ","").replace(" ","")
     data_path = split_data_process(text)
+    print("数据预处理完成")
+
     data_prompt_path = load_data_text(data_path,api_key)
+    print("图片描述生成完成")
     tts_key = pdata.iloc[1, 1]
     tts_url = pdata.iloc[3, 1]
     tts_region = pdata.iloc[2, 1]
     tts_data = load_source_data_text(data_path,tts_key,tts_url,tts_region)
-    if len(pdata.iloc[7, 1]) < 10:
-        iamge_source= load_image_data(data_prompt_path,api_key)
-        path_vedio = merge_vedio(iamge_source, tts_data)
-    else :
-        print("走midjourney")
-        iamge_source = load_image_data_midjourney(data_prompt_path)
-        image_split = image_split_data(iamge_source)
-        path_vedio= merge_vedio_mid(image_split, tts_data)
+    print("音频生成完成")
+
+    iamge_source= load_image_data(data_prompt_path,api_key)
+    print("图片生成完成")
+    path_vedio = merge_vedio(iamge_source, tts_data,data_path)
+    print("视频生成完成")
+    print(path_vedio)
 
 
     return path_vedio
