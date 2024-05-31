@@ -78,13 +78,11 @@ def merge_vedio(image_dir_path,audio_dir_path,word_file_path):
     final_clip = concatenate_videoclips(clips)
     new_parent = image_dir_path.replace("data_image","data_vedio").split("story")[0]
     # 导出视频
-    if not os.path.exists(new_parent):
-        os.makedirs(new_parent)
     new_path = image_dir_path.replace("data_image","data_vedio")
     final_clip.write_videofile(new_path+".mp4", fps=24,audio_codec="aac")  # 可以根据需要调整fps值
     return new_path+".mp4"
 
 if __name__ == '__main__':
-    merge_vedio("data/data_image/屋外风吹着","data/data_audio/屋外风吹着","data/data_split/屋外风吹着.csv")
+    merge_vedio("data/data_image/长达700","data/data_audio/长达700","data/data_split/长达700.csv")
 
 

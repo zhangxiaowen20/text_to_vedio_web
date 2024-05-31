@@ -39,7 +39,6 @@ def receive_text():
     text = text.replace(" ","").replace(" ","")
     data_path = split_data_process(text)
     print("数据预处理完成")
-
     data_prompt_path = load_data_text(data_path,api_key)
     print("图片描述生成完成")
     tts_key = pdata.iloc[1, 1]
@@ -47,7 +46,6 @@ def receive_text():
     tts_region = pdata.iloc[2, 1]
     tts_data = load_source_data_text(data_path,tts_key,tts_url,tts_region)
     print("音频生成完成")
-
     iamge_source= load_image_data(data_prompt_path,api_key)
     print("图片生成完成")
     path_vedio = merge_vedio(iamge_source, tts_data,data_path)
