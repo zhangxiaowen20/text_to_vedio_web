@@ -1,14 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-作者：张贵发
-日期：2023年07月07日
-描述：调用微软官网的api，生成的文本合成语音
-"""
+
 import os, requests, time
 from xml.etree import ElementTree
 import pandas as pd
 # 你注册申请的微软tts的api——key
-subscription_key = "5d9b556860034ce1be0be09e3305cf9b"
+subscription_key = ""
 fetch_token_url = "https://eastasia.api.cognitive.microsoft.com/sts/v1.0/issueToken"
 base_url ="https://eastasia.tts.speech.microsoft.com/"
 class TextToSpeech(object):
