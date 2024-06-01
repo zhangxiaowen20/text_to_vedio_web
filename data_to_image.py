@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-作者：张贵发
-日期：2023年07月07日
-描述：根据生成的prompt提示词来生成对应的图片
-"""
+
 import os.path
 
 import requests
